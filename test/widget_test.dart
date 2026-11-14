@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:app_blue_care/core/app_routes.dart';
+import 'package:app_blue_care/main.dart' as app;
+import 'package:app_blue_care/features/meds/data/demo_meds_store.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/widget_helpers.dart';
 
@@ -41,10 +44,10 @@ void main() {
       expect(find.text('Revisa tu correo.'), findsOneWidget);
       await tapText(tester, 'Volver a iniciar sesión');
       await tapText(tester, 'Continuar sin iniciar sesión');
-      expect(find.text('Explora Blue Care.'), findsOneWidget);
+      expect(find.text('Blue Care Meds'), findsOneWidget);
     },
   );
-  testWidgets('Invitation, OTP, consent, activation and onboarding journey', (
+  testWidgets('Invitation, OTP, consent and activation go straight to home', (
     tester,
   ) async {
     await open(tester, AppRoutes.invitation);
@@ -57,14 +60,66 @@ void main() {
     await tester.tap(find.byType(Checkbox));
     await tapText(tester, 'Activar mi cuenta');
     expect(find.text('Ya eres parte.'), findsOneWidget);
-    await tapText(tester, 'Conocer mi Blue Care');
-    await tapText(tester, 'Siguiente');
-    await tapText(tester, 'Siguiente');
-    await tapText(tester, 'Continuar');
-    await tapText(tester, 'Ahora no · Ir al inicio');
+    await tapText(tester, 'Ir al inicio');
     expect(find.text('Bienvenido a Blue Care.'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });
+  testWidgets('First launch offers onboarding and guest orders persist', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    await app.main();
+    await tester.pumpAndSettle();
+    expect(find.text('CONOCE BLUE CARE'), findsOneWidget);
+    expect(find.text('Iniciar sesión'), findsNothing);
+    for (var step = 0; step < 3; step++) {
+      await tapText(tester, 'Siguiente');
+    }
+    expect(find.text('Explora y haz tu pedido.'), findsOneWidget);
+    await tapText(tester, 'Continuar');
+    expect(find.text('Iniciar sesión'), findsOneWidget);
+    expect(find.text('Tengo una invitación'), findsOneWidget);
+    await tapText(tester, 'Explorar sin iniciar sesión');
+
+    final addProduct = find.byKey(const ValueKey(MedsProduct.toothbrush));
+    await tester.ensureVisible(addProduct);
+    await tester.pumpAndSettle();
+    await tester.tap(addProduct);
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Ver carrito (1) · Q28'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tapText(tester, 'Ver carrito (1) · Q28');
+    expect(find.text('1 × Cepillo dental suave'), findsOneWidget);
+    await tapText(tester, 'Crear pedido de prueba');
+    expect(find.text('Ver carrito (0) · Q0'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox());
+    await app.main();
+    await tester.pumpAndSettle();
+    expect(find.text('Iniciar sesión'), findsOneWidget);
+    expect(find.text('CONOCE BLUE CARE'), findsNothing);
+    await tapText(tester, 'Explorar sin iniciar sesión');
+    await tapText(tester, 'Ver pedidos de prueba');
+    expect(find.text('1 × Cepillo dental suave'), findsOneWidget);
+    expect(find.text('Total de prueba Q28'), findsOneWidget);
+  });
+
+  testWidgets('Skipping onboarding is remembered', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await app.main();
+    await tester.pumpAndSettle();
+    await tapText(tester, 'Omitir');
+    expect(find.text('Tengo una invitación'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox());
+    await app.main();
+    await tester.pumpAndSettle();
+    expect(find.text('Tengo una invitación'), findsOneWidget);
+  });
+
   testWidgets('Password reset, unknown routes, and Google preview', (
     tester,
   ) async {

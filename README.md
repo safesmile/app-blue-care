@@ -1,6 +1,6 @@
 # Blue Care · Autenticación
 
-Prototipo Flutter basado en los mockups originales: temas claro/oscuro, navegación y validaciones locales. Sin API, sesión real, registro público, envío de correos, SDK de Google ni solicitud de permisos.
+Prototipo Flutter basado en los mockups originales con temas claro y oscuro, navegación y validaciones locales. La autenticación y los pedidos funcionan en modo de demostración.
 
 ## Ubicación de trabajo
 
@@ -25,15 +25,16 @@ La app normal sigue el tema del sistema. La galería permite elegir claro u oscu
 
 ## Recorridos
 
+- Primer arranque → introducción de cuatro pasos, con opción de omitir → bienvenida. La app recuerda en el dispositivo si ya se vio u omitió la introducción.
 - Bienvenida → inicio de sesión → destino provisional de inicio.
-- Bienvenida → tengo una invitación → aceptación → verificación → contraseña y consentimiento → cuenta activada → introducción de tres pasos → recordatorios → destino provisional.
+- Bienvenida → tengo una invitación → aceptación → verificación → contraseña y consentimiento → cuenta activada → destino provisional de inicio.
 - Inicio de sesión → tengo una invitación → recuperación de invitación.
 - Inicio de sesión → olvidé mi contraseña → solicitud → revisa tu correo.
 - Nueva contraseña → contraseña actualizada → inicio de sesión.
 - Invitación vencida → solicitar nuevo enlace o contactar a la clínica.
-- Explorar sin iniciar sesión → destino público provisional.
+- Explorar sin iniciar sesión → catálogo de Blue Care Meds → carrito → pedido de prueba guardado en el dispositivo.
 
-Las pantallas de inicio y explorar son destinos explícitamente provisionales; no representan una sesión autenticada ni un catálogo implementado. Google navega al destino de demostración. Los correos no se envían y las notificaciones no se activan.
+El catálogo muestra productos y precios de ejemplo. Los pedidos de prueba se pueden consultar en el mismo dispositivo y quedan fuera de los sistemas de cobro y entrega. El inicio de membresía y el acceso con Google siguen en modo de demostración.
 
 En la demostración puedes usar cualquier correo válido, una contraseña de al menos 12 caracteres con letras y números, y cualquier código de seis dígitos. Esas comprobaciones no validan identidad. No se guardan credenciales.
 

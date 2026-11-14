@@ -154,7 +154,7 @@ Future<void> checkJourneys() async {
   checkText('Revisa tu correo.');
   await press('Volver a iniciar sesión');
   await press('Continuar sin iniciar sesión');
-  checkText('Explora Blue Care.');
+  checkText('Blue Care Meds');
   stdout.writeln('PASS login validation, recovery, guest');
   await startAt(AppRoutes.invitation);
   await press('Aceptar invitación');
@@ -170,13 +170,9 @@ Future<void> checkJourneys() async {
   await settle();
   await press('Activar mi cuenta');
   checkText('Ya eres parte.');
-  await press('Conocer mi Blue Care');
-  await press('Siguiente');
-  await press('Siguiente');
-  await press('Continuar');
-  await press('Ahora no · Ir al inicio');
+  await press('Ir al inicio');
   checkText('Bienvenido a Blue Care.');
-  stdout.writeln('PASS invitation, verification, activation, onboarding');
+  stdout.writeln('PASS invitation, verification, activation');
   await startAt('${AppRoutes.resetPassword}?token=preview');
   fill(0, 'BlueCare2026!');
   fill(1, 'BlueCare2026!');

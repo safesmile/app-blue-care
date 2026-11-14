@@ -14,6 +14,8 @@ abstract final class AppRoutes {
   static const plan = '/onboarding/plan';
   static const prevention = '/onboarding/prevention';
   static const benefits = '/onboarding/benefits';
+  static const onboardingMeds = '/onboarding/meds';
+  static const meds = '/meds';
   static const notifications = '/onboarding/notifications';
   static const homePreview = '/preview/home';
   static const explore = '/explore';
@@ -34,6 +36,8 @@ abstract final class AppRoutes {
     plan,
     prevention,
     benefits,
+    onboardingMeds,
+    meds,
     notifications,
     homePreview,
     explore,

@@ -3,14 +3,50 @@ import '../../../core/app_routes.dart';
 import '../../../core/navigation.dart';
 import '../../../core/presentation/page_widgets.dart';
 
-enum OnboardingStep { plan, prevention, benefits }
+enum OnboardingStep {
+  plan(AppRoutes.plan),
+  prevention(AppRoutes.prevention),
+  benefits(AppRoutes.benefits),
+  meds(AppRoutes.onboardingMeds);
 
-class OnboardingScreen extends StatelessWidget {
-  const OnboardingScreen({super.key, required this.step});
+  const OnboardingStep(this.route);
+  final String route;
+}
+
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key, required this.step, this.onCompleted});
   final OnboardingStep step;
+  final Future<void> Function()? onCompleted;
+
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  bool saving = false;
+
+  Future<void> finish() async {
+    if (saving) return;
+    setState(() => saving = true);
+    try {
+      await widget.onCompleted?.call();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No pudimos recordar esta elección en el dispositivo.'),
+        ),
+      );
+    }
+    if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
+    navigateTo(context, AppRoutes.welcome, clear: true);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final index = step.index;
+    final index = widget.step.index;
+    final steps = OnboardingStep.values;
+    final isLast = index == steps.length - 1;
     return PageFrame(
       children: [
         Column(
@@ -31,7 +67,7 @@ class OnboardingScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '·  ${index + 1} / 3',
+                  '${index + 1} / ${steps.length}',
                   style: const TextStyle(
                     letterSpacing: 0,
                     fontSize: 10,
@@ -39,7 +75,7 @@ class OnboardingScreen extends StatelessWidget {
                   ),
                 ),
                 TextButton(
-                  onPressed: () => navigateTo(context, AppRoutes.notifications),
+                  onPressed: saving ? null : finish,
                   child: const Text('Omitir'),
                 ),
               ],
@@ -178,12 +214,28 @@ class OnboardingScreen extends StatelessWidget {
                   ),
                 ],
               ),
+            if (widget.step == OnboardingStep.meds)
+              FeatureCard(
+                navy: true,
+                children: [
+                  const Icon(
+                    Icons.shopping_bag_outlined,
+                    size: 40,
+                    color: Color(0xFF50DDCF),
+                  ),
+                  const SizedBox(height: 16),
+                  FeatureTitle('Blue Care Meds'),
+                  const SizedBox(height: 12),
+                  const Text('Catálogo, carrito y pedidos'),
+                ],
+              ),
             const SizedBox(height: 26),
             PageHeading(
               [
                 'Tu membresía,\nsiempre contigo.',
                 'Cuida tu sonrisa,\na tiempo.',
                 'Más beneficios\npara tu día a día.',
+                'Explora y haz tu pedido.',
               ][index],
             ),
             PageBody(
@@ -191,13 +243,14 @@ class OnboardingScreen extends StatelessWidget {
                 'Consulta tu plan, su vigencia y los beneficios que aún tienes disponibles.',
                 'Sigue tus limpiezas preventivas y conoce cuándo corresponde tu próximo cuidado.',
                 'Lleva tu carné digital y descubre descuentos y cupones en nuestra red de aliados.',
+                'Consulta el catálogo de Blue Care Meds y arma tu pedido sin crear una cuenta.',
               ][index],
             ),
             const SizedBox(height: 26),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                3,
+                steps.length,
                 (i) => Container(
                   margin: const EdgeInsets.symmetric(horizontal: 3),
                   width: i == index ? 26 : 7,
@@ -213,25 +266,20 @@ class OnboardingScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             PrimaryButton(
-              index == 2 ? 'Continuar' : 'Siguiente',
-              () => navigateTo(
-                context,
-                [
-                  AppRoutes.prevention,
-                  AppRoutes.benefits,
-                  AppRoutes.notifications,
-                ][index],
-              ),
+              isLast ? 'Continuar' : 'Siguiente',
+              isLast
+                  ? finish
+                  : () => navigateTo(context, steps[index + 1].route),
+              busy: saving,
             ),
             if (index > 0)
               LinkButton(
                 'Anterior',
-                () => Navigator.of(context).canPop()
-                    ? Navigator.pop(context)
-                    : navigateTo(
-                        context,
-                        index == 1 ? AppRoutes.plan : AppRoutes.prevention,
-                      ),
+                saving
+                    ? null
+                    : () => Navigator.of(context).canPop()
+                          ? Navigator.pop(context)
+                          : navigateTo(context, steps[index - 1].route),
               ),
           ],
         ),

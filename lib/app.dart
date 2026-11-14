@@ -15,6 +15,7 @@ import 'features/auth/presentation/password_screen.dart';
 import 'features/auth/presentation/password_updated_screen.dart';
 import 'features/auth/presentation/verification_screen.dart';
 import 'features/explore/presentation/explore_screen.dart';
+import 'features/meds/presentation/meds_catalog_screen.dart';
 import 'features/onboarding/presentation/notifications_screen.dart';
 import 'features/onboarding/presentation/onboarding_screen.dart';
 import 'features/welcome/presentation/welcome_screen.dart';
@@ -25,12 +26,14 @@ class BlueCareApp extends StatelessWidget {
     this.repository,
     this.themeMode = ThemeMode.system,
     this.initialRoute = AppRoutes.welcome,
+    this.onOnboardingCompleted,
     this.initialArguments,
   });
   final AuthRepository? repository;
   final ThemeMode themeMode;
   final String initialRoute;
   final Object? initialArguments;
+  final Future<void> Function()? onOnboardingCompleted;
   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'Blue Care',
@@ -72,16 +75,25 @@ class BlueCareApp extends StatelessWidget {
         token: token,
       ),
       AppRoutes.passwordUpdated => const PasswordUpdatedScreen(),
-      AppRoutes.plan => const OnboardingScreen(step: OnboardingStep.plan),
-      AppRoutes.prevention => const OnboardingScreen(
-        step: OnboardingStep.prevention,
+      AppRoutes.plan => OnboardingScreen(
+        step: OnboardingStep.plan,
+        onCompleted: onOnboardingCompleted,
       ),
-      AppRoutes.benefits => const OnboardingScreen(
+      AppRoutes.prevention => OnboardingScreen(
+        step: OnboardingStep.prevention,
+        onCompleted: onOnboardingCompleted,
+      ),
+      AppRoutes.benefits => OnboardingScreen(
         step: OnboardingStep.benefits,
+        onCompleted: onOnboardingCompleted,
+      ),
+      AppRoutes.onboardingMeds => OnboardingScreen(
+        step: OnboardingStep.meds,
+        onCompleted: onOnboardingCompleted,
       ),
       AppRoutes.notifications => const NotificationsScreen(),
-      AppRoutes.homePreview => const ExploreScreen(exploring: false),
-      AppRoutes.explore => const ExploreScreen(),
+      AppRoutes.homePreview => const ExploreScreen(),
+      AppRoutes.meds || AppRoutes.explore => const MedsCatalogScreen(),
       _ => const NotFoundScreen(),
     };
     return MaterialPageRoute<void>(settings: settings, builder: (_) => screen);

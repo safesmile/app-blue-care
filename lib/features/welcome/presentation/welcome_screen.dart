@@ -58,7 +58,7 @@ class WelcomeScreen extends StatelessWidget {
           const SizedBox(height: 26),
           PageHeading('Todo tu cuidado,\nen un solo lugar.'),
           PageBody(
-            'Consulta tu plan, lleva tu carné y descubre los beneficios de ser parte de Blue Care.',
+            'Consulta tu membresía o explora el catálogo de Blue Care Meds como invitado.',
           ),
           const SizedBox(height: 24),
           PrimaryButton(
@@ -70,7 +70,8 @@ class WelcomeScreen extends StatelessWidget {
             'Tengo una invitación',
             () => navigateTo(context, AppRoutes.invitation),
           ),
-          LinkButton(
+          const SizedBox(height: 10),
+          SecondaryButton(
             'Explorar sin iniciar sesión',
             () => navigateTo(context, AppRoutes.explore),
           ),

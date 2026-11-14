@@ -25,12 +25,7 @@ class ActivatedScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           PrimaryButton(
-            'Conocer mi Blue Care',
-            () => navigateTo(context, AppRoutes.plan),
-          ),
-          const SizedBox(height: 10),
-          LinkButton(
-            'Ir directamente al inicio',
+            'Ir al inicio',
             () => navigateTo(context, AppRoutes.homePreview, clear: true),
           ),
         ],
